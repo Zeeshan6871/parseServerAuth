@@ -1,0 +1,1 @@
+{"code":101,"level":"error","message":"Invalid username/password.","stack":"Error: Invalid username/password.\n    at D:\\Mintix\\Assignment Projects\\React with parse backend\\ParseServerBackend\\node_modules\\parse-server\\lib\\Routers\\UsersRouter.js:135:17","timestamp":"2024-11-08T05:40:21.228Z"}

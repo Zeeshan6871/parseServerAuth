@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Parse from "parse"; // Import Parse SDK (ensure it's installed)
 import { handleParseLogout } from "../services/parse.services";
 
 const Appheader = () => {

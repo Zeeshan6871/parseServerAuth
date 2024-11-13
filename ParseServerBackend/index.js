@@ -10,7 +10,7 @@ app.use(cors());
 const dashboard = new parseDashBoard({
     "apps": [
     {
-      "serverURL": "http://localhost:1337/parse",
+      "serverURL": "https://parseserverauth.onrender.com/parse",
       "appId": "myAppId",
       "masterKey": "myMasterKey",
       "appName": "MyApp"
@@ -33,7 +33,7 @@ const server = new ParseServer({
   appId: 'myAppId',
   masterKey: 'myMasterKey', // Keep this key secret!
   fileKey: 'optionalFileKey',
-  serverURL: 'http://localhost:1337/parse', // Don't forget to change to https if needed
+  serverURL: 'https://parseserverauth.onrender.com/parse', // Don't forget to change to https if needed
   allowClientClassCreation:true,
   encodeParseObjectInCloudFunction:true
 });
@@ -46,5 +46,5 @@ app.use('/parse', server.app);
 app.use("/dashboard",dashboard)
 
 app.listen(1337, function() {
-  console.log(`parse-server-example running on port 1337. http://localhost:1337/parse`);
+  console.log(`parse-server-example running on port 1337. https://parseserverauth.onrender.com/parse`);
 });

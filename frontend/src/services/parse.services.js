@@ -1,8 +1,11 @@
 import Parse from 'parse';
 
 // Initialize Parse with your app's configuration
-Parse.initialize("myAppId");
-Parse.serverURL = 'http://localhost:1337/parse';
+Parse.initialize(process.env.REACT_APP_PARSE_APP_ID || "myAppId");
+Parse.serverURL = process.env.REACT_APP_SERVER_URL || 'http://localhost:1337/parse';
+
+console.log(process.env.REACT_APP_PARSE_APP_ID,process.env.REACT_APP_SERVER_URL );
+
 
 export const signupUser = async ({ id, name, password, email, country, address, gender }) => {
   const user = new Parse.User();

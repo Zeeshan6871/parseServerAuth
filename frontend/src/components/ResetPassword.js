@@ -403,9 +403,6 @@ const ResetPasswordPage = () => {
                 <Link className="btn btn-link" to="/login">
                   Remembered your password? Login
                 </Link>
-                <Link className="btn btn-link ms-2" to="/register">
-                  Register new user
-                </Link>
               </div>
             </div>
           </form>

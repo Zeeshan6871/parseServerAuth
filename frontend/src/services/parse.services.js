@@ -79,4 +79,12 @@ export const resetUserPassword = async (username, newPassword) => {
   }
 };
 
+export const handleParseLogout = async () => {
+        try {
+            await Parse.User.logOut(); // Log out using Parse Server
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    };
+
 

@@ -4,13 +4,15 @@ const cors = require("cors")
 const app = express();
 require("dotenv").config();
 const parseDashBoard = require("parse-dashboard")
+const BASE_URL = "http://localhost:1337/parse"
+// const BASE_URL = "https://parseserverauth.onrender.com"
 
 app.use(cors());
 
 const dashboard = new parseDashBoard({
     "apps": [
     {
-      "serverURL": "https://parseserverauth.onrender.com/parse",
+      "serverURL": BASE_URL,
       "appId": "myAppId",
       "masterKey": "myMasterKey",
       "appName": "MyApp"
@@ -28,12 +30,12 @@ const dashboard = new parseDashBoard({
   
 
 const server = new ParseServer({
-  databaseURI: process.env.MONGODB_URI ||  'mongodb://localhost:27017/dev', // Connection string for your MongoDB database
-  // cloud: './cloud/main.js', // Path to your Cloud Code
+  databaseURI: process.env.MONGODB_URI ||  'mongodb://localhost:27017/dev', 
+  cloud: './cloud/main.js', // Path to your Cloud Code
   appId: 'myAppId',
-  masterKey: 'myMasterKey', // Keep this key secret!
-  fileKey: 'optionalFileKey',
-  serverURL: 'https://parseserverauth.onrender.com/parse', // Don't forget to change to https if needed
+  masterKey: 'myMasterKey', 
+  fileKey: 'optionalFileKey', 
+  serverURL: BASE_URL, 
   allowClientClassCreation:true,
   encodeParseObjectInCloudFunction:true
 });
@@ -46,5 +48,5 @@ app.use('/parse', server.app);
 app.use("/dashboard",dashboard)
 
 app.listen(1337, function() {
-  console.log(`parse-server-example running on port 1337. https://parseserverauth.onrender.com/parse`);
+  console.log(`parse-server-example running on port 1337. ${BASE_URL}`);
 });

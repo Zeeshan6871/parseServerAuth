@@ -2,9 +2,9 @@ import Parse from 'parse';
 
 // Initialize Parse with your app's configuration
 Parse.initialize(process.env.REACT_APP_PARSE_APP_ID || "myAppId");
-Parse.serverURL = process.env.REACT_APP_SERVER_URL || 'http://localhost:1337/parse';
+Parse.serverURL =  'http://localhost:1337/parse';
 
-console.log(process.env.REACT_APP_PARSE_APP_ID,process.env.REACT_APP_SERVER_URL );
+// console.log(process.env.REACT_APP_PARSE_APP_ID,process.env.REACT_APP_SERVER_URL );
 
 
 export const signupUser = async ({ id, name, password, email, country, address, gender }) => {
@@ -41,46 +41,30 @@ export const loginUser = async (username, password) => {
   }
 };
 
-// Validate Username (Check if user exists)
-export const validateUsername = async (formData) => {
-  const { username } = formData;
-
-  
+// Validate Username via Cloud Code
+export const validateUsername = async (username) => {
   try {
-    const query = new Parse.Query(Parse.User);
-    query.equalTo('username', username);
-    const user = await query.first();    
-    if (user) {
-      return { message: "Username found, please enter a new password." };
-    } else {
-      throw new Error("Username not found.");
-    }
-    
+    const response = await Parse.Cloud.run('validateUsername', { username });
+    console.log(response);
+    return response; // { message: "Username found, please enter a new password." }
   } catch (error) {
-    throw new Error("Error checking username: " + error.message);
+    console.error("Error:", error.message);
+    throw error;
   }
 };
 
-// Reset User Password
+// Reset Password via Cloud Code
 export const resetUserPassword = async (username, newPassword) => {
   try {
-    const query = new Parse.Query(Parse.User);
-    query.equalTo('username', username);
-    const user = await query.first();
-    
-    if (user) {
-      user.set('password', newPassword);  // Set new password
-      await user.save();
-      
-      return { success: true, message: 'Password reset successful.' };
-    } else {
-      throw new Error('User not found');
-    }
-
+    const response = await Parse.Cloud.run('resetUserPassword', { username, newPassword });
+    console.log(response);
+    return response; // { success: true, message: 'Password reset successful.' }
   } catch (error) {
-    throw new Error(error.message);
+    console.error("Error:", error.message);
+    throw error;
   }
 };
+
 
 export const handleParseLogout = async () => {
         try {

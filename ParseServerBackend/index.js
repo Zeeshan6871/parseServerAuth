@@ -4,8 +4,8 @@ const cors = require("cors")
 const app = express();
 require("dotenv").config();
 const parseDashBoard = require("parse-dashboard")
-const BASE_URL = "http://localhost:1337/parse"
-// const BASE_URL = "https://parseserverauth.onrender.com"
+// const BASE_URL = "http://localhost:1337/parse"
+const BASE_URL = "https://parseserverauth.onrender.com"
 
 app.use(cors());
 

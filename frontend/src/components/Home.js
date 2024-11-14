@@ -5,15 +5,18 @@ import { toast } from 'react-toastify';
 const Home = () => {
   const [todos, setTodos] = useState([]);
   const [newTodoText, setNewTodoText] = useState('');
-  const [showModal, setShowModal] = useState(false); // Modal visibility state
-  const [currentTodoId, setCurrentTodoId] = useState(null); // Store the ID of the todo being edited
-  const [currentTodoText, setCurrentTodoText] = useState(''); // Store the text of the todo being edited
+  const [showModal, setShowModal] = useState(false);
+  const [currentTodoId, setCurrentTodoId] = useState(null);
+  const [currentTodoText, setCurrentTodoText] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Fetch all todos when component mounts
   useEffect(() => {
+    setLoading(true);
     const fetchTodos = async () => {
       const fetchedTodos = await getTodos();
       setTodos(fetchedTodos);
+      setLoading(false);
     };
     fetchTodos();
   }, []);
@@ -107,47 +110,54 @@ const Home = () => {
       </div>
 
       {/* Todo List Section */}
-      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {todos && todos.map((todo) => (
-          <div key={todo.id} className="col">
-            <div className="card shadow-sm">
-              <img 
-                src="bgImg.jpg" 
-                className="card-img-top" 
-                alt="Todo Image"
-              />
-              <div className="card-body">
-                <h5 className="card-title">{todo.get('text')}</h5>
-                <p className={`card-text ${todo.get('completed') ? "text-success" : "text-danger"}`}>
-                  {todo.get('completed') ? 'Completed' : 'Not Completed'}
-                </p>
-                <div className="d-flex justify-content-between align-items-center">
-                  <button 
-                    className="btn btn-outline-info btn-sm"
-                    onClick={() => handleToggleCompletion(todo.id)}
-                  >
-                    {todo.get('completed') ? 'Mark as Incomplete' : 'Mark as Completed'}
-                  </button>
-                  <div>
-                    <button 
-                      className="btn btn-warning btn-sm me-2" 
-                      onClick={() => openEditModal(todo.id, todo.get('text'))}
+      {loading ? (
+        <div className='w-100 d-flex align-items-center justify-content-center'>
+          <div className="spinner-border text-white-50" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ) :
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          {todos && todos.map((todo) => (
+            <div key={todo.id} className="col">
+              <div className="card shadow-sm">
+                <img
+                  src="bgImg.jpg"
+                  className="card-img-top"
+                  alt="Todo Image"
+                />
+                <div className="card-body">
+                  <h5 className="card-title">{todo.get('text')}</h5>
+                  <p className={`card-text ${todo.get('completed') ? "text-success" : "text-danger"}`}>
+                    {todo.get('completed') ? 'Completed' : 'Not Completed'}
+                  </p>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <button
+                      className="btn btn-outline-info btn-sm"
+                      onClick={() => handleToggleCompletion(todo.id)}
                     >
-                      Edit
+                      {todo.get('completed') ? 'Mark as Incomplete' : 'Mark as Completed'}
                     </button>
-                    <button 
-                      className="btn btn-danger btn-sm" 
-                      onClick={() => handleDeleteTodo(todo.id)}
-                    >
-                      Delete
-                    </button>
+                    <div>
+                      <button
+                        className="btn btn-warning btn-sm me-2"
+                        onClick={() => openEditModal(todo.id, todo.get('text'))}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDeleteTodo(todo.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>}
 
       {/* Bootstrap Modal for Editing Todo */}
       <div className={`modal fade ${showModal ? 'show' : ''}`} style={{ display: showModal ? 'block' : 'none' }} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden={!showModal}>

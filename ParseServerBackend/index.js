@@ -4,8 +4,7 @@ const cors = require("cors")
 const app = express();
 require("dotenv").config();
 const parseDashBoard = require("parse-dashboard")
-// const BASE_URL = "http://localhost:1337/parse"
-const BASE_URL = "https://parseserverauth.onrender.com"
+const BASE_URL = process.env.BASE_URL;
 
 app.use(cors());
 
@@ -13,15 +12,16 @@ const dashboard = new parseDashBoard({
     "apps": [
     {
       "serverURL": BASE_URL,
-      "appId": "myAppId",
-      "masterKey": "myMasterKey",
-      "appName": "MyApp"
+      "appId": process.env.APP_ID,
+      "masterKey":process.env.MASTER_KEY ,
+      "appName":process.env.APP_NAME,
+      "serverURL": BASE_URL,
     }
   ],
     "users": [
       {
-        "user":"user1",
-        "pass":"pass"
+        "user":process.env.DASHBOARD_USER,
+        "pass":process.env.DASHBOARD_PASSWORD
       }
     ]
   })
@@ -30,12 +30,13 @@ const dashboard = new parseDashBoard({
   
 
 const server = new ParseServer({
-  databaseURI: process.env.MONGODB_URI ||  'mongodb://localhost:27017/dev', 
+  databaseURI: process.env.DB_URI ||  'mongodb://localhost:27017/dev', 
   cloud: './cloud/main.js', // Path to your Cloud Code
-  appId: 'myAppId',
-  masterKey: 'myMasterKey', 
-  fileKey: 'optionalFileKey', 
-  serverURL: BASE_URL, 
+  appId: process.env.APP_ID,
+  masterKey: process.env.MASTER_KEY , 
+  fileKey: process.env.FILE_KEY, 
+  serverURL: BASE_URL,
+  publicServerURL:BASE_URL,
   allowClientClassCreation:true,
   encodeParseObjectInCloudFunction:true
 });

@@ -8,17 +8,19 @@ const getCurrentUser = () => Parse.User.current();
 const Todo = Parse.Object.extend('Todo');
 
 // Create Todo
-export const createTodo = async (text) => {
+export const createTodo = async (newTodoText,newTodoImage) => {  
   const currentUser = getCurrentUser();
+  const parseFile = await uploadFile(newTodoImage);
   if (!currentUser) {
     console.error('User must be logged in');
     return null;
   }
 
   const todo = new Todo();
-  todo.set('text', text);
+  todo.set('text', newTodoText);
   todo.set('completed', false);
   todo.set('user', currentUser);
+  todo.set('image', parseFile);
 
   try {
     await todo.save();

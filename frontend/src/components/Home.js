@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 const Home = () => {
   const [todos, setTodos] = useState([]);
   const [newTodoText, setNewTodoText] = useState('');
+  const [newTodoImage, setNewTodoImage] = useState(null); // Track new Todo image
   const [showModal, setShowModal] = useState(false);
   const [currentTodoId, setCurrentTodoId] = useState(null);
   const [currentTodoText, setCurrentTodoText] = useState('');
@@ -20,7 +21,7 @@ const Home = () => {
       setLoading(false);
     };
     fetchTodos();
-  }, []);
+  }, [deleteTodo,updateTodo]);
 
   // Handle form submit for creating a new Todo
   const handleCreateTodo = async (e) => {
@@ -30,13 +31,25 @@ const Home = () => {
       return;
     }
 
+    setLoading(true);
     try {
-      const newTodo = await createTodo(newTodoText);
+      const newTodo = await createTodo(newTodoText,newTodoImage);
       setTodos([...todos, newTodo]);
       setNewTodoText('');
+      setNewTodoImage(null); // Reset file input
       toast.success('Todo added successfully');
     } catch (error) {
       toast.error('Error creating Todo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle file upload for new Todo
+  const handleNewTodoFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewTodoImage(file);
     }
   };
 
@@ -49,6 +62,17 @@ const Home = () => {
       toast.success('Todo updated successfully');
     } catch (error) {
       toast.error('Error updating Todo');
+    }
+  };
+
+// Handle delete todo 
+  const handleDeleteTodo = async (todoId) => {
+    try {
+      await deleteTodo(todoId);
+      setTodos(todos.filter(todo => todo.id !== todoId));
+      toast.success('Todo deleted successfully');
+    } catch (error) {
+      toast.error('Error deleting Todo');
     }
   };
 
@@ -93,22 +117,41 @@ const Home = () => {
       <h1 className="text-center mb-4">Welcome to React ParseServer Todo App</h1>
 
       {/* Todo Input Section */}
-      <div className="card mb-4 shadow-sm">
-        <div className="card-body">
-          <form onSubmit={handleCreateTodo} className="text-center">
-            <div className="input-group">
-              <input
-                type="text"
-                value={newTodoText}
-                onChange={(e) => setNewTodoText(e.target.value)}
-                placeholder="Enter new todo"
-                className="form-control"
-              />
-              <button type="submit" className="btn btn-primary">Add Todo</button>
-            </div>
-          </form>
-        </div>
+      <div className="card mb-4 shadow-sm border-0 rounded-lg">
+  <div className="card-body">
+    <h5 className="card-title text-center mb-4">Create New Todo</h5>
+    <form onSubmit={handleCreateTodo}>
+      <div className="mb-3">
+        <label htmlFor="todoText" className="form-label">Todo Text</label>
+        <input
+          type="text"
+          id="todoText"
+          value={newTodoText}
+          onChange={(e) => setNewTodoText(e.target.value)}
+          placeholder="Enter your todo here"
+          className="form-control"
+          required
+        />
       </div>
+
+      <div className="mb-3">
+        <label htmlFor="todoImage" className="form-label">Attach an Image</label>
+        <input
+          type="file"
+          id="todoImage"
+          onChange={handleNewTodoFileUpload}
+          className="form-control"
+          accept="image/*"
+        />
+      </div>
+
+      <div className="d-grid gap-2">
+        <button type="submit" className="btn btn-primary btn-lg">Add Todo</button>
+      </div>
+    </form>
+  </div>
+      </div>
+
 
       {/* Todo List Section */}
       {loading ? (
@@ -129,7 +172,7 @@ const Home = () => {
                   <img
                     src={todo.get('image') ? todo.get('image').url() : 'bgImg.jpg'}
                     className="card-img-top"
-                    alt="Todo Image"
+                    alt="TodoImage"
                     style={{aspectRatio:"16/9",objectFit:"fill"}}
                   />
                   <div className="card-body">
@@ -153,7 +196,7 @@ const Home = () => {
                         </button>
                         <button
                           className="btn btn-danger btn-sm"
-                          onClick={() => deleteTodo(todo.id)}
+                          onClick={() => handleDeleteTodo(todo.id)}
                         >
                           Delete
                         </button>

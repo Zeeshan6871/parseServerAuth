@@ -114,3 +114,34 @@ export const deleteTodo = async (todoId) => {
     return false;
   }
 };
+
+// Handle file upload
+export const uploadFile = async (file) => {
+  const parseFile = new Parse.File(file.name, file);
+
+  try {
+    await parseFile.save();
+    return parseFile;
+  } catch (error) {
+    throw new Error('Error uploading file: ' + error.message);
+  }
+};
+
+export const updateTodoWithImage = async (todoId, file) => {
+  try {
+    // Upload the file to Parse
+    const parseFile = await uploadFile(file);
+
+    const query = new Parse.Query(Todo);
+    const todo = await query.get(todoId);
+
+    // Set the uploaded file (image) to the Todo object
+    todo.set('image', parseFile);
+
+    // Save the updated Todo
+    await todo.save();
+    return todo;
+  } catch (error) {
+    throw new Error('Error updating Todo with image: ' + error.message);
+  }
+};

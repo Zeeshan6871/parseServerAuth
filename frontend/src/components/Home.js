@@ -75,6 +75,14 @@ const Home = () => {
       toast.error('Error deleting Todo');
     }
   };
+  const handleToggleTodo = async (todoId) => {
+    try {
+      const updatedTodo = await toggleTodoCompletion(todoId);
+      setTodos(todos.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo)))
+    } catch (error) {
+      toast.error('Error deleting Todo');
+    }
+  };
 
   // Handle file upload for a Todo
   const handleFileUpload = async (e) => {
@@ -183,7 +191,7 @@ const Home = () => {
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <button
                         className="btn btn-outline-info btn-sm"
-                        onClick={() => toggleTodoCompletion(todo.id)}
+                        onClick={() => handleToggleTodo(todo.id)}
                       >
                         {todo.get('completed') ? 'Mark as Incomplete' : 'Mark as Completed'}
                       </button>

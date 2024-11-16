@@ -5,10 +5,14 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
+import { TodoProvider } from './store/todo.context';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <App />
+    <TodoProvider> 
+        <App />
+    </TodoProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

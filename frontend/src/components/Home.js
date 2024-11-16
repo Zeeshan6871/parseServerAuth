@@ -1,124 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { createTodo, getTodos, updateTodo, toggleTodoCompletion, deleteTodo, updateTodoWithImage } from '../services/todo.service';
-import { toast } from 'react-toastify';
+import React from 'react';
+import { useTodoContext } from '../store/todo.context';
 
 const Home = () => {
-  const [todos, setTodos] = useState([]);
-  const [newTodoText, setNewTodoText] = useState('');
-  const [newTodoImage, setNewTodoImage] = useState(null); // Track new Todo image
-  const [showModal, setShowModal] = useState(false);
-  const [currentTodoId, setCurrentTodoId] = useState(null);
-  const [currentTodoText, setCurrentTodoText] = useState('');
-  const [currentTodoImage, setCurrentTodoImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const {
+    state,
+    handleCreateTodo,
+    handleNewTodoFileUpload,
+    handleUpdateTodo,
+    handleDeleteTodo,
+    handleToggleTodo,
+    handleFileUpload,
+    openEditModal,
+    closeModal,
+    formatDate,
+    setState
+  } = useTodoContext();
 
-  // Fetch all todos when component mounts
-  useEffect(() => {
-    setLoading(true);
-    const fetchTodos = async () => {
-      const fetchedTodos = await getTodos();
-      setTodos(fetchedTodos);
-      setLoading(false);
-    };
-    fetchTodos();
-  }, [deleteTodo,updateTodo]);
-
-  // Handle form submit for creating a new Todo
-  const handleCreateTodo = async (e) => {
-    e.preventDefault();
-    if (newTodoText.trim() === '') {
-      toast.error('Todo cannot be empty');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const newTodo = await createTodo(newTodoText,newTodoImage);
-      setTodos([...todos, newTodo]);
-      setNewTodoText('');
-      setNewTodoImage(null); // Reset file input
-      toast.success('Todo added successfully');
-    } catch (error) {
-      toast.error('Error creating Todo');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle file upload for new Todo
-  const handleNewTodoFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setNewTodoImage(file);
-    }
-  };
-
-  // Handle updating the text of a Todo
-  const handleUpdateTodo = async () => {
-    try {
-      const updatedTodo = await updateTodo(currentTodoId, currentTodoText);
-      setTodos(todos.map(todo => (todo.id === currentTodoId ? updatedTodo : todo)));
-      setShowModal(false); // Close modal after update
-      toast.success('Todo updated successfully');
-    } catch (error) {
-      toast.error('Error updating Todo');
-    }
-  };
-
-// Handle delete todo 
-  const handleDeleteTodo = async (todoId) => {
-    try {
-      await deleteTodo(todoId);
-      setTodos(todos.filter(todo => todo.id !== todoId));
-      toast.success('Todo deleted successfully');
-    } catch (error) {
-      toast.error('Error deleting Todo');
-    }
-  };
-  const handleToggleTodo = async (todoId) => {
-    try {
-      const updatedTodo = await toggleTodoCompletion(todoId);
-      setTodos(todos.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo)))
-    } catch (error) {
-      toast.error('Error deleting Todo');
-    }
-  };
-
-  // Handle file upload for a Todo
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      try {
-        const updatedTodo = await updateTodoWithImage(currentTodoId, file);
-        setTodos(todos.map(todo => (todo.id === currentTodoId ? updatedTodo : todo)));
-        toast.success('Image uploaded successfully');
-      } catch (error) {
-        toast.error('Error uploading image');
-      }
-    }
-  };
-
-  const openEditModal = (todoId, todoText, todoImage) => {
-    setCurrentTodoId(todoId);
-    setCurrentTodoText(todoText);
-    setCurrentTodoImage(todoImage);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
-  const formatDate = (date) => {
-    const options = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    return new Date(date).toLocaleString('en-US', options);
-  };
+  const { todos, newTodo, currentTodo, showModal, loading } = state;
 
   return (
     <div className="container mt-5">
@@ -126,40 +24,42 @@ const Home = () => {
 
       {/* Todo Input Section */}
       <div className="card mb-4 shadow-sm border-0 rounded-lg">
-  <div className="card-body">
-    <h5 className="card-title text-center mb-4">Create New Todo</h5>
-    <form onSubmit={handleCreateTodo}>
-      <div className="mb-3">
-        <label htmlFor="todoText" className="form-label">Todo Text</label>
-        <input
-          type="text"
-          id="todoText"
-          value={newTodoText}
-          onChange={(e) => setNewTodoText(e.target.value)}
-          placeholder="Enter your todo here"
-          className="form-control"
-          required
-        />
-      </div>
+        <div className="card-body">
+          <h5 className="card-title text-center mb-4">Create New Todo</h5>
+          <form onSubmit={handleCreateTodo}>
+            <div className="mb-3">
+              <label htmlFor="todoText" className="form-label">Todo Text</label>
+              <input
+                type="text"
+                id="todoText"
+                value={newTodo.text}
+                onChange={(e) => {
+                  const updatedNewTodo = { ...newTodo, text: e.target.value };
+                  setState(prevState => ({ ...prevState, newTodo: updatedNewTodo }));
+                }}
+                placeholder="Enter your todo here"
+                className="form-control"
+                required
+              />
+            </div>
 
-      <div className="mb-3">
-        <label htmlFor="todoImage" className="form-label">Attach an Image</label>
-        <input
-          type="file"
-          id="todoImage"
-          onChange={handleNewTodoFileUpload}
-          className="form-control"
-          accept="image/*"
-        />
-      </div>
+            <div className="mb-3">
+              <label htmlFor="todoImage" className="form-label">Attach an Image</label>
+              <input
+                type="file"
+                id="todoImage"
+                onChange={handleNewTodoFileUpload}
+                className="form-control"
+                accept="image/*"
+              />
+            </div>
 
-      <div className="d-grid gap-2">
-        <button type="submit" className="btn btn-primary btn-lg">Add Todo</button>
+            <div className="d-grid gap-2">
+              <button type="submit" className="btn btn-primary btn-lg">Add Todo</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </form>
-  </div>
-      </div>
-
 
       {/* Todo List Section */}
       {loading ? (
@@ -168,7 +68,7 @@ const Home = () => {
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>
-      ) :
+      ) : (
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           {todos && todos.map((todo) => {
             const createdAt = formatDate(todo.createdAt);
@@ -181,7 +81,7 @@ const Home = () => {
                     src={todo.get('image') ? todo.get('image').url() : 'bgImg.jpg'}
                     className="card-img-top"
                     alt="TodoImage"
-                    style={{aspectRatio:"16/9",objectFit:"fill"}}
+                    style={{ aspectRatio: "16/9", objectFit: "fill" }}
                   />
                   <div className="card-body">
                     <h5 className="card-title">{todo.get('text')}</h5>
@@ -221,7 +121,7 @@ const Home = () => {
             );
           })}
         </div>
-      }
+      )}
 
       {/* Bootstrap Modal for Editing Todo */}
       <div className={`modal fade ${showModal ? 'show' : ''}`} style={{ display: showModal ? 'block' : 'none' }} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden={!showModal}>
@@ -235,8 +135,11 @@ const Home = () => {
               <input
                 type="text"
                 className="form-control"
-                value={currentTodoText}
-                onChange={(e) => setCurrentTodoText(e.target.value)}
+                value={currentTodo.text}
+                onChange={(e) => setState((prevState) => ({
+                  ...prevState,
+                  currentTodo: { ...prevState.currentTodo, text: e.target.value },
+                }))}
               />
               <div className="mt-3">
                 <label htmlFor="fileUpload" className="form-label">Upload an image</label>

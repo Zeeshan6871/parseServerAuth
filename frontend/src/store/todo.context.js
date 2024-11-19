@@ -2,10 +2,10 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { createTodo, getTodos, updateTodo, toggleTodoCompletion, deleteTodo, updateTodoWithImage } from '../services/todo.service';
 import { toast } from 'react-toastify';
 
-// Create the context
+// todo context
 const TodoContext = createContext();
 
-// Create the provider component
+// todo context provider
 export const TodoProvider = ({ children }) => {
   const [state, setState] = useState({
     todos: [],
@@ -24,7 +24,7 @@ export const TodoProvider = ({ children }) => {
 
   const { newTodo, currentTodo } = state;
 
-  // Fetch all todos when component mounts
+  // Fetch all todos when component render
   useEffect(() => {
     setState((prevState) => ({ ...prevState, loading: true }));
     const fetchTodos = async () => {
@@ -48,7 +48,7 @@ export const TodoProvider = ({ children }) => {
       setState((prevState) => ({
         ...prevState,
         todos: [...prevState.todos, newTodoItem],
-        newTodo: { text: '', image: null }, // Reset new todo state
+        newTodo: { text: '', image: null }, 
       }));
       toast.success('Todo added successfully');
     } catch (error) {

@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
-import { useTodoContext } from '../../store/todo.context';
-import { createTodo, getTodos, updateTodo, toggleTodoCompletion, deleteTodo, updateTodoWithImage } from '../../services/todo.service';
 import { toast } from 'react-toastify';
+import { todoService } from 'services';
 import Loader from '../../components/Loader';
 import DynamicModal from '../../components/Modals/DynamicModal';
 import AddTodo from './AddTodo';
+import { todoContext } from 'store';
 
 const Todo = () => {
-  const { state, setState } = useTodoContext();
+  const { state, setState } = todoContext.useTodoContext();
   const { todos, newTodo, currentTodo, showModal, loading } = state;
 
   // Subscribe to live updates using useEffect
@@ -42,7 +42,7 @@ const Todo = () => {
     
     const fetchTodos = async () => {
       setState((prevState) => ({ ...prevState, loading: true }));
-      const { subscription, todos } = await getTodos(onTodoChange);
+      const { subscription, todos } = await todoService.getTodos(onTodoChange);
       mySubscription = subscription;
       setState((prevState) => ({ ...prevState, todos, loading: false }));
     };
@@ -67,7 +67,7 @@ const Todo = () => {
 
     setState((prevState) => ({ ...prevState, loading: true }));
     try {
-      const newTodoItem = await createTodo(newTodo.text, newTodo.image);
+      const newTodoItem = await todoService.createTodo(newTodo.text, newTodo.image);
       setState((prevState) => ({
         ...prevState,
         todos: [...prevState.todos, newTodoItem],
@@ -95,7 +95,7 @@ const Todo = () => {
   // Handle updating the text of a Todo
   const handleUpdateTodo = async () => {
     try {
-      const updatedTodo = await updateTodo(currentTodo.id, currentTodo.text);
+      const updatedTodo = await todoService.updateTodo(currentTodo.id, currentTodo.text);
       setState((prevState) => ({
         ...prevState,
         todos: prevState.todos.map(todo => (todo.id === currentTodo.id ? updatedTodo : todo)),
@@ -110,7 +110,7 @@ const Todo = () => {
   // Handle delete todo
   const handleDeleteTodo = async (todoId) => {
     try {
-      await deleteTodo(todoId);
+      await todoService.deleteTodo(todoId);
       setState((prevState) => ({
         ...prevState,
         todos: prevState.todos.filter(todo => todo.id !== todoId),
@@ -124,7 +124,7 @@ const Todo = () => {
   // Handle toggle todo completion
   const handleToggleTodo = async (todoId) => {
     try {
-      const updatedTodo = await toggleTodoCompletion(todoId);
+      const updatedTodo = await todoService.toggleTodoCompletion(todoId);
       setState((prevState) => ({
         ...prevState,
         todos: prevState.todos.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo)),
@@ -139,7 +139,7 @@ const Todo = () => {
     const file = e.target.files[0];
     if (file) {
       try {
-        const updatedTodo = await updateTodoWithImage(currentTodo.id, file);
+        const updatedTodo = await todoService.updateTodoWithImage(currentTodo.id, file);
         setState((prevState) => ({
           ...prevState,
           todos: prevState.todos.map(todo => (todo.id === currentTodo.id ? updatedTodo : todo)),

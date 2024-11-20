@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { handlePasswordReset } from "../../services/auth.service";
+import { auth } from "services";
 import Loader from "../../components/Loader";
 
 const ResetPasswordPage = () => {
@@ -25,7 +25,7 @@ const ResetPasswordPage = () => {
 
     if (validate()) {
         setIsLoading(true);
-        handlePasswordReset(email)
+        auth.handlePasswordReset(email)
           .then((resp) => {
             toast.success(resp.message);
             setTimeout(() => {

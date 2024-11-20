@@ -1,7 +1,9 @@
-import { useTodoContext } from "../../store/todo.context";
+import { todoContext } from "store";
+
 
 const AddTodo = ({newTodo,handleCreateTodo,handleNewTodoFileUpload})=>{
-    const {setState}= useTodoContext();
+    const {setState}= todoContext.useTodoContext();
+    
     return (
         <div className="card mb-4 shadow-sm border-0 rounded-lg">
         <div className="card-body">

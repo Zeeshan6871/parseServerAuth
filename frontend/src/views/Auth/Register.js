@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { signupUser } from "../../services/auth.service";
+import { auth } from "services";
 import Loader from "../../components/Loader";
 
 const Register = () => {
@@ -84,7 +84,7 @@ const Register = () => {
 
             console.log("valid data",formData);
 
-            signupUser(regobj)
+            auth.signupUser(regobj)
                 .then((data) => {
                     toast.success("Registered successfully.");
                     navigate("/login");

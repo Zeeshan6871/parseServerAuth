@@ -1,4 +1,4 @@
-import { useTodoContext } from "../../store/todo.context";
+import { useTodoContext } from "../../myStore/todo.context";
 
 const EditingModal = (prop)=>{
     const { setState } = useTodoContext();

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { loginUser } from "../../services/auth.service";
 import Loader from "../../components/Loader";
+import { auth } from "services";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -10,6 +10,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [validated, setValidated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
 
   const usenavigate = useNavigate();
 
@@ -38,7 +39,7 @@ const Login = () => {
       const { username, password } = formData;
 
       setIsLoading(true);
-      loginUser(username, password)
+      auth.loginUser(username, password)
         .then((resp) => {
           toast.success(resp.message);         
           sessionStorage.setItem("username", resp.user?.get("name"));

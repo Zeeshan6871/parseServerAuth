@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { handlePasswordReset } from "../services/parse.services";
+import { handlePasswordReset } from "../services/auth.service";
 
 const ResetPasswordPage = () => {
   const [email,setEmail] = useState("");

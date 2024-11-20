@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { signupUser } from "../services/parse.services";
-// import { registerUser } from '../services/auth.api.services';
+import { signupUser } from "../services/auth.service";
 
 const Register = () => {
     const [formData, setFormData] = useState({

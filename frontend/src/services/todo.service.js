@@ -1,8 +1,4 @@
-import Parse from 'parse';
-
-Parse.initialize(process.env.REACT_APP_PARSE_APP_ID);
-Parse.serverURL = process.env.REACT_APP_SERVER_URL || 'http://localhost:1337/parse';
-
+import Parse from "./parse.services";
 const getCurrentUser = () => Parse.User.current();
 
 const Todo = Parse.Object.extend('Todo');
@@ -31,8 +27,8 @@ export const createTodo = async (newTodoText,newTodoImage) => {
   }
 };
 
-// Get All Todos
-export const getTodos = async () => {
+
+export const getTodos = async (onTodoChange) => {
   const currentUser = getCurrentUser();
   if (!currentUser) {
     console.error('User must be logged in');
@@ -41,10 +37,33 @@ export const getTodos = async () => {
 
   const query = new Parse.Query(Todo);
   query.equalTo('user', currentUser);
+  
+  // const subscription = await query.subscribe(); 
+  
+  if (!currentUser) {
+    console.error('User must be logged in');
+    return [];
+  }
+
+  // subscription.on('create', (todo) => {
+  //   console.log('New Todo created', todo);
+  //   onTodoChange?.('create', todo); 
+  // });
+
+  // subscription.on('update', (todo) => {
+  //   console.log('Todo updated', todo);
+  //   onTodoChange?.('update', todo); 
+  // });
+
+  // subscription.on('delete', (todo) => {
+  //   console.log('Todo deleted', todo);
+  //   onTodoChange?.('delete', todo);
+  // });
 
   try {
     const todos = await query.find();
-    return todos;
+    return { todos };
+    // return { todos, subscription };
   } catch (error) {
     console.error('Error fetching todos', error);
     return [];

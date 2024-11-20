@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { loginUser } from "../services/parse.services";
-// import { loginUser } from '../services/auth.api.services';
+import { loginUser } from "../services/auth.service";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -40,12 +39,12 @@ const Login = () => {
       setIsLoading(true);
       loginUser(username, password)
         .then((resp) => {
-          toast.success(resp.message); // success message from API
-          sessionStorage.setItem("username", username);
-          usenavigate("/"); // Redirect after successful login
+          toast.success(resp.message);         
+          sessionStorage.setItem("username", resp.user?.get("name"));
+          usenavigate("/"); 
         })
         .catch((err) => {
-          toast.error("Login Failed: " + err.message); // Error message from API
+          toast.error("Login Failed: " + err.message);
         }).finally(() => {
           setIsLoading(false);
         });

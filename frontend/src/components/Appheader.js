@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { handleParseLogout } from "../services/parse.services";
+import { handleParseLogout } from "../services/auth.service";
 
 const Appheader = () => {
     const [displayusername, displayusernameupdate] = useState('');
@@ -20,7 +20,7 @@ const Appheader = () => {
                 displayusernameupdate(username);
             }
         }
-    }, [location]);
+    }, [location,usenavigate]);
 
     const handleLogout = async () => {
         try {

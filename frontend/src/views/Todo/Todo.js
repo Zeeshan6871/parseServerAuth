@@ -4,6 +4,7 @@ import { createTodo, getTodos, updateTodo, toggleTodoCompletion, deleteTodo, upd
 import { toast } from 'react-toastify';
 import Loader from '../../components/Loader';
 import DynamicModal from '../../components/Modals/DynamicModal';
+import AddTodo from './AddTodo';
 
 const Todo = () => {
   const { state, setState } = useTodoContext();
@@ -177,44 +178,8 @@ const Todo = () => {
     <div className="container mt-5">
       <h1 className="text-center mb-4">Welcome to React ParseServer Todo App</h1>
 
-      {/* Todo Input Section */}
-      <div className="card mb-4 shadow-sm border-0 rounded-lg">
-        <div className="card-body">
-          <h5 className="card-title text-center mb-4">Create New Todo</h5>
-          <form onSubmit={handleCreateTodo}>
-            <div className="mb-3">
-              <label htmlFor="todoText" className="form-label">Todo Text</label>
-              <input
-                type="text"
-                id="todoText"
-                value={newTodo.text}
-                onChange={(e) => {
-                  const updatedNewTodo = { ...newTodo, text: e.target.value };
-                  setState(prevState => ({ ...prevState, newTodo: updatedNewTodo }));
-                }}
-                placeholder="Enter your todo here"
-                className="form-control"
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="todoImage" className="form-label">Attach an Image</label>
-              <input
-                type="file"
-                id="todoImage"
-                onChange={handleNewTodoFileUpload}
-                className="form-control"
-                accept="image/*"
-              />
-            </div>
-
-            <div className="d-grid gap-2">
-              <button type="submit" className="btn btn-primary btn-lg">Add Todo</button>
-            </div>
-          </form>
-        </div>
-      </div>
+      {/*Add Todo  */}
+      <AddTodo newTodo={newTodo} handleCreateTodo={handleCreateTodo} handleNewTodoFileUpload={handleNewTodoFileUpload}  />
 
       {/* Todo List Section */}
       {loading ? (

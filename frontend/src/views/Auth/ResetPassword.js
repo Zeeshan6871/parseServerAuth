@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { handlePasswordReset } from "../services/auth.service";
+import { handlePasswordReset } from "../../services/auth.service";
+import Loader from "../../components/Loader";
 
 const ResetPasswordPage = () => {
   const [email,setEmail] = useState("");
@@ -88,13 +89,7 @@ const ResetPasswordPage = () => {
               {/* Submit Button */}
               <div className="text-center p-4">
                 <button type="submit" className="btn btn-primary w-100" disabled={isLoading}>
-                  {isLoading ? (
-                    <div className="spinner-border" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  ) : (
-                    "Sent Reset password email"
-                  )}
+                  {isLoading ? <Loader/> : "Sent Reset password email"}
                 </button>
               </div>
               <div className="text-center">

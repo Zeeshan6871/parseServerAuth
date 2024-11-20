@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { loginUser } from "../services/auth.service";
+import { loginUser } from "../../services/auth.service";
+import Loader from "../../components/Loader";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -136,9 +137,7 @@ const Login = () => {
               </div>
               <div className="text-center p-4">
                 <button type="submit" className="btn btn-primary w-100" disabled={isLoading}>
-                  {isLoading ? <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div> : "Login"}
+                  {isLoading ? <Loader/> : "Login"}
                 </button>
               </div>
               <div className="d-flex justify-content-center text-center mb-3">

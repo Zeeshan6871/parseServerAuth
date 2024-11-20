@@ -35,16 +35,19 @@ export const getTodos = async (onTodoChange) => {
     return [];
   }
 
-  const query = new Parse.Query(Todo);
+  const query = new Parse.Query('Todo');
   query.equalTo('user', currentUser);
   
-  // const subscription = await query.subscribe(); 
+  // const subscription = await query.subscribe();
   
   if (!currentUser) {
     console.error('User must be logged in');
     return [];
   }
 
+  // subscription.on('open', () => {
+  //   console.log('New Todo created'); 
+  // });
   // subscription.on('create', (todo) => {
   //   console.log('New Todo created', todo);
   //   onTodoChange?.('create', todo); 

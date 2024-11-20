@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { signupUser } from "../services/auth.service";
+import { signupUser } from "../../services/auth.service";
+import Loader from "../../components/Loader";
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -291,9 +292,7 @@ const Register = () => {
 
                             <div className="p-4 text-center">
                                 <button type="submit" className="btn btn-primary w-100" disabled={loading}>
-                                    {loading ? <div className="spinner-border" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                    </div> : "Register"}
+                                    {loading ? <Loader/> : "Register"}
                                 </button>
                             </div>
                             <div className="text-center mb-2">

@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
-import { useTodoContext } from '../store/todo.context';
-import { createTodo, getTodos, updateTodo, toggleTodoCompletion, deleteTodo, updateTodoWithImage } from '../services/todo.service';
+import { useTodoContext } from '../../store/todo.context';
+import { createTodo, getTodos, updateTodo, toggleTodoCompletion, deleteTodo, updateTodoWithImage } from '../../services/todo.service';
 import { toast } from 'react-toastify';
+import Loader from '../../components/Loader';
+import DynamicModal from '../../components/Modals/DynamicModal';
 
-const Home = () => {
+const Todo = () => {
   const { state, setState } = useTodoContext();
   const { todos, newTodo, currentTodo, showModal, loading } = state;
 
@@ -217,9 +219,7 @@ const Home = () => {
       {/* Todo List Section */}
       {loading ? (
         <div className='w-100 d-flex align-items-center justify-content-center'>
-          <div className="spinner-border text-white-50" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
+          <Loader/>
         </div>
       ) : (
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -277,42 +277,28 @@ const Home = () => {
       )}
 
       {/* Bootstrap Modal for Editing Todo */}
-      <div className={`modal fade ${showModal ? 'show' : ''}`} style={{ display: showModal ? 'block' : 'none' }} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden={!showModal}>
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">Edit Todo</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={closeModal}></button>
-            </div>
-            <div className="modal-body">
-              <input
-                type="text"
-                className="form-control"
-                value={currentTodo.text}
-                onChange={(e) => setState((prevState) => ({
-                  ...prevState,
-                  currentTodo: { ...prevState.currentTodo, text: e.target.value },
-                }))}
-              />
-              <div className="mt-3">
-                <label htmlFor="fileUpload" className="form-label">Upload an image</label>
-                <input
-                  type="file"
-                  id="fileUpload"
-                  className="form-control"
-                  onChange={handleFileUpload}
-                />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={closeModal}>Close</button>
-              <button type="button" className="btn btn-primary" onClick={handleUpdateTodo}>Save changes</button>
-            </div>
-          </div>
+      <DynamicModal showModal={showModal} onClose={closeModal}  onSave={handleUpdateTodo} footerContent={false}>
+        <input
+          type="text"
+          className="form-control"
+          value={currentTodo.text}
+          onChange={(e) => setState((prevState) => ({
+            ...prevState,
+            currentTodo: { ...prevState.currentTodo, text: e.target.value },
+          }))}
+        />
+        <div className="mt-3">
+          <label htmlFor="fileUpload" className="form-label">Upload an image</label>
+          <input
+            type="file"
+            id="fileUpload"
+            className="form-control"
+            onChange={handleFileUpload}
+          />
         </div>
-      </div>
+      </DynamicModal>
     </div>
   );
 };
 
-export default Home;
+export default Todo;

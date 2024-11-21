@@ -5,8 +5,7 @@ const DynamicModal = ({
   onClose, 
   onSave, 
   modalTitle = 'Modal Title', 
-  children, 
-  footerContent 
+  children
 }) => {
  
   return (

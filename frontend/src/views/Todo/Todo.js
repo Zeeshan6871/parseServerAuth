@@ -4,34 +4,29 @@ import { todoService } from 'services';
 import Loader from '../../components/Loader';
 import DynamicModal from '../../components/Modals/DynamicModal';
 import AddTodo from './AddTodo';
-import { todoContext } from 'store';
+import { todoStore } from 'store';
 
 const Todo = () => {
-  const { state, setState } = todoContext.useTodoContext();
-  const { todos, newTodo, currentTodo, showModal, loading } = state;
+  const {
+    todos, newTodo, currentTodo, showModal, loading,
+    setState, createTodo, updateTodo, deleteTodo, toggleTodoCompletion,
+    setLoading, openModal, closeModal
+  } = todoStore.useTodoStore((store => store));
+  
 
-  // Subscribe to live updates using useEffect
+  // live query subscription
   useEffect(() => {
     // Fetch all todos initially
     const onTodoChange = (action, todo) => {
       switch (action) {
         case 'create':
-          setState((prevState) => ({
-            ...prevState,
-            todos: [...prevState.todos, todo],
-          }));
+          createTodo(todo);
           break;
         case 'update':
-          setState((prevState) => ({
-            ...prevState,
-            todos: prevState.todos.map((item) => (item.id === todo.id ? todo : item)),
-          }));
+          updateTodo(todo);
           break;
         case 'delete':
-          setState((prevState) => ({
-            ...prevState,
-            todos: prevState.todos.filter((item) => item.id !== todo.id),
-          }));
+          deleteTodo(todo.id);
           break;
         default:
           break;
@@ -41,10 +36,11 @@ const Todo = () => {
     let mySubscription = null;
     
     const fetchTodos = async () => {
-      setState((prevState) => ({ ...prevState, loading: true }));
+      setLoading(true);
       const { subscription, todos } = await todoService.getTodos(onTodoChange);
       mySubscription = subscription;
-      setState((prevState) => ({ ...prevState, todos, loading: false }));
+      
+      setState({ todos, loading: false });
     };
 
     fetchTodos();
@@ -55,29 +51,28 @@ const Todo = () => {
         mySubscription.unsubscribe();
       }
     };
-  }, [setState]);
+  }, [setState, createTodo, updateTodo, deleteTodo, setLoading]);
 
   // Handle form submit for creating a new Todo
   const handleCreateTodo = async (e) => {
     e.preventDefault();
-    if (newTodo.text.trim() === '') {
-      toast.error('Todo cannot be empty');
-      return;
-    }
-
-    setState((prevState) => ({ ...prevState, loading: true }));
+    
+    setLoading(true);
     try {
+      if (!newTodo.text) {
+        throw new Error("Title should be there")
+      }
+  
+      if(!newTodo.image){
+        throw new Error("Image shold be selected");
+      }
       const newTodoItem = await todoService.createTodo(newTodo.text, newTodo.image);
-      setState((prevState) => ({
-        ...prevState,
-        todos: [...prevState.todos, newTodoItem],
-        newTodo: { text: '', image: null },
-      }));
+      createTodo(newTodoItem);
       toast.success('Todo added successfully');
     } catch (error) {
-      toast.error('Error creating Todo');
+      toast.error(error.message);
     } finally {
-      setState((prevState) => ({ ...prevState, loading: false }));
+      setLoading(false);
     }
   };
 
@@ -85,25 +80,23 @@ const Todo = () => {
   const handleNewTodoFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setState((prevState) => ({
-        ...prevState,
-        newTodo: { ...prevState.newTodo, image: file },
-      }));
+      setState({
+        newTodo: { ...newTodo, image: file },
+      });
     }
   };
 
   // Handle updating the text of a Todo
   const handleUpdateTodo = async () => {
     try {
+      if(!currentTodo.text){
+        throw new Error("Title can not be empty");
+      }
       const updatedTodo = await todoService.updateTodo(currentTodo.id, currentTodo.text);
-      setState((prevState) => ({
-        ...prevState,
-        todos: prevState.todos.map(todo => (todo.id === currentTodo.id ? updatedTodo : todo)),
-        showModal: false,
-      }));
+      updateTodo(updatedTodo);
       toast.success('Todo updated successfully');
     } catch (error) {
-      toast.error('Error updating Todo');
+      toast.error(error.message);
     }
   };
 
@@ -111,10 +104,7 @@ const Todo = () => {
   const handleDeleteTodo = async (todoId) => {
     try {
       await todoService.deleteTodo(todoId);
-      setState((prevState) => ({
-        ...prevState,
-        todos: prevState.todos.filter(todo => todo.id !== todoId),
-      }));
+      deleteTodo(todoId);
       toast.success('Todo deleted successfully');
     } catch (error) {
       toast.error('Error deleting Todo');
@@ -125,10 +115,7 @@ const Todo = () => {
   const handleToggleTodo = async (todoId) => {
     try {
       const updatedTodo = await todoService.toggleTodoCompletion(todoId);
-      setState((prevState) => ({
-        ...prevState,
-        todos: prevState.todos.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo)),
-      }));
+      toggleTodoCompletion(updatedTodo);
     } catch (error) {
       toast.error('Error toggling Todo completion');
     }
@@ -140,10 +127,7 @@ const Todo = () => {
     if (file) {
       try {
         const updatedTodo = await todoService.updateTodoWithImage(currentTodo.id, file);
-        setState((prevState) => ({
-          ...prevState,
-          todos: prevState.todos.map(todo => (todo.id === currentTodo.id ? updatedTodo : todo)),
-        }));
+        updateTodo(updatedTodo);
         toast.success('Image uploaded successfully');
       } catch (error) {
         toast.error('Error uploading image');
@@ -152,15 +136,7 @@ const Todo = () => {
   };
 
   const openEditModal = (todoId, todoText, todoImage) => {
-    setState((prevState) => ({
-      ...prevState,
-      currentTodo: { id: todoId, text: todoText, image: todoImage },
-      showModal: true,
-    }));
-  };
-
-  const closeModal = () => {
-    setState((prevState) => ({ ...prevState, showModal: false }));
+    openModal({ id: todoId, text: todoText, image: todoImage });
   };
 
   const formatDate = (date) => {
@@ -178,13 +154,13 @@ const Todo = () => {
     <div className="container mt-5">
       <h1 className="text-center mb-4">Welcome to React ParseServer Todo App</h1>
 
-      {/*Add Todo  */}
-      <AddTodo newTodo={newTodo} handleCreateTodo={handleCreateTodo} handleNewTodoFileUpload={handleNewTodoFileUpload}  />
+      {/* Add Todo */}
+      <AddTodo newTodo={newTodo} handleCreateTodo={handleCreateTodo} handleNewTodoFileUpload={handleNewTodoFileUpload} />
 
       {/* Todo List Section */}
       {loading ? (
         <div className='w-100 d-flex align-items-center justify-content-center'>
-          <Loader/>
+          <Loader />
         </div>
       ) : (
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -207,23 +183,14 @@ const Todo = () => {
                       {todo.get('completed') ? 'Completed' : 'Not Completed'}
                     </p>
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                      <button
-                        className="btn btn-outline-info btn-sm"
-                        onClick={() => handleToggleTodo(todo.id)}
-                      >
+                      <button className="btn btn-outline-info btn-sm" onClick={() => handleToggleTodo(todo.id)}>
                         {todo.get('completed') ? 'Mark as Incomplete' : 'Mark as Completed'}
                       </button>
                       <div>
-                        <button
-                          className="btn btn-warning btn-sm me-2"
-                          onClick={() => openEditModal(todo.id, todo.get('text'), todo.get('image'))}
-                        >
+                        <button className="btn btn-warning btn-sm me-2" onClick={() => openEditModal(todo.id, todo.get('text'), todo.get('image'))}>
                           Edit
                         </button>
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => handleDeleteTodo(todo.id)}
-                        >
+                        <button className="btn btn-danger btn-sm" onClick={() => handleDeleteTodo(todo.id)}>
                           Delete
                         </button>
                       </div>
@@ -242,15 +209,14 @@ const Todo = () => {
       )}
 
       {/* Bootstrap Modal for Editing Todo */}
-      <DynamicModal showModal={showModal} onClose={closeModal}  onSave={handleUpdateTodo} footerContent={false}>
+      <DynamicModal showModal={showModal} onClose={closeModal} onSave={handleUpdateTodo}>
         <input
           type="text"
           className="form-control"
           value={currentTodo.text}
-          onChange={(e) => setState((prevState) => ({
-            ...prevState,
-            currentTodo: { ...prevState.currentTodo, text: e.target.value },
-          }))}
+          onChange={(e) => setState({
+            currentTodo: { ...currentTodo, text: e.target.value }
+          })}
         />
         <div className="mt-3">
           <label htmlFor="fileUpload" className="form-label">Upload an image</label>

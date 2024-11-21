@@ -1,33 +1,38 @@
-import React, { createContext, useState, useContext } from 'react';
+import {create} from 'zustand';
 
-// todo context
-const TodoContext = createContext();
+export const useTodoStore = create((set) => ({
+  todos: [],
+  newTodo: { text: '', image: null },
+  currentTodo: { id: null, text: '', image: null },
+  showModal: false,
+  loading: false,
 
-// todo context provider
-export const TodoProvider = ({ children }) => {
-  const [state, setState] = useState({
-    todos: [],
-    newTodo: {
-      text: '',
-      image: null,
-    },
-    currentTodo: {
-      id: null,
-      text: '',
-      image: null,
-    },
+  // Set new state values
+  setState: (newState) => set((state) => ({ ...state, ...newState })),
+
+  // Actions
+  createTodo: (newTodoItem) => set((state) => ({
+    todos: [...state.todos, newTodoItem],
+    newTodo: { text: '', image: null },
+  })),
+
+  updateTodo: (updatedTodo) => set((state) => ({
+    todos: state.todos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo)),
     showModal: false,
-    loading: false,
-  });
+  })),
 
-  return (
-    <TodoContext.Provider value={{state,setState }}>
-      {children}
-    </TodoContext.Provider>
-  );
-};
+  deleteTodo: (todoId) => set((state) => ({
+    todos: state.todos.filter((todo) => todo.id !== todoId),
+  })),
 
-// hook to use the TodoContext
-export const useTodoContext = () => {
-  return useContext(TodoContext);
-};
+  toggleTodoCompletion: (selectedTodo) => set((state) => {
+    return ({
+    todos: state.todos.map((todo) =>
+      todo.id === selectedTodo.id ? selectedTodo : todo
+    ),
+  })}),
+
+  setLoading: (isLoading) => set(() => ({ loading: isLoading })),
+  openModal: (todo) => set(() => ({ currentTodo: todo, showModal: true })),
+  closeModal: () => set(() => ({ showModal: false })),
+}));

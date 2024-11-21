@@ -1,7 +1,7 @@
-import { useTodoContext } from "../../myStore/todo.context";
+import { todoContext } from "store";
 
 const EditingModal = (prop)=>{
-    const { setState } = useTodoContext();
+    const { setState } = todoContext.useTodoContext();
     return (
         <div className={`modal fade ${prop.showModal ? 'show' : ''}`} style={{ display: prop.showModal ? 'block' : 'none' }} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden={!prop.showModal}>
         <div className="modal-dialog">
